@@ -1,9 +1,9 @@
 import random
 from colorama import Fore, Style, init
-# from remember_me.vocab_loader import load_vocabulary
-# from remember_me.starlist_manager import StarListManager
-from vocab_loader import load_vocabulary
-from starlist_manager import StarListManager
+from remember_me.vocab_loader import load_vocabulary
+from remember_me.starlist_manager import StarListManager
+# from vocab_loader import load_vocabulary
+# from starlist_manager import StarListManager
 from openai import OpenAI
 import os
 
