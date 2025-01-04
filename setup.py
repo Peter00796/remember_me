@@ -8,7 +8,7 @@ setup(
     long_description_content_type="text/markdown",
     author="Yanxin Peng",
     author_email="peterpen@usc.edu",
-    url="https://github.com/your_username/remember_me",  # Update with your GitHub repository
+    url="https://github.com/Peter00796/remember_me.git",  # Update with your GitHub repository
     license="MIT",
     packages=find_packages(),
     install_requires=[

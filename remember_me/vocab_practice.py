@@ -53,12 +53,6 @@ def validate_with_ai(input_meaning, correct_meaning):
             model="moonshot-v1-8k",
             messages=[
                 {
-                    "role": "system",
-                    "content": "你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。"
-                               "你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一切涉及恐怖主义，"
-                               "种族歧视，黄色暴力等问题的回答。Moonshot AI 为专有名词，不可翻译成其他语言。"
-                },
-                {
                     "role": "user",
                     "content": (
                         f"Hello! I'm trying to validate the meaning of a word. "
@@ -194,17 +188,22 @@ def section_testing_mode(sections, current_section=None, starlist_manager=None):
         word = random.choice(words_to_test)
         print(f"\nWord: {word['word']} ({total_words - len(words_to_test) + 1}/{total_words})")
 
-        user_input = input("Enter the meaning, 's' to star this word, or 'q' to quit this section: ").strip().lower()
+        user_input = input("cmd: ").strip().lower()
         if user_input == 'q':
-            print("Returning to main menu...")
-            return
+            print("Are you sure you want to quit the test? (y/n)")
+            confirm = input().strip().lower()
+            if confirm == 'y':
+                print("Exiting test...")
+                return
+            else:
+                print("Resuming test...")
         elif user_input == 's':
             print(starlist_manager.add_to_star_list(word))
         elif validate_meaning_with_fallback(user_input, word['definition']):
             print("Correct! Great job!")
             correct_count += 1
         else:
-            print(f"Incorrect. The correct meaning is: {word['definition']}")
+            print(f"Incorrect. The correct meaning is: {TextColors.BOLD}{TextColors.LIGHT_YELLOW}{word['definition']}{TextColors.ENDC}")
 
         words_to_test.remove(word)
 
@@ -259,6 +258,8 @@ def general_learning_mode(words_to_learn, section_name=None, starlist_manager=No
                     show_meaning = True
             elif command == 's':
                 print(starlist_manager.add_to_star_list(word))
+            elif command == 'r':
+                print(starlist_manager.remove_from_star_list(word))
             elif command == 'p':
                 if index > 0:
                     index -= 1
@@ -271,16 +272,10 @@ def general_learning_mode(words_to_learn, section_name=None, starlist_manager=No
                     model="moonshot-v1-8k",
                     messages=[
                         {
-                            "role": "system",
-                            "content": "你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。"
-                                       "你会为用户提供安全，有帮助，准确的回答。同时，你会拒绝一切涉及恐怖主义，"
-                                       "种族歧视，黄色暴力等问题的回答。"
-                        },
-                        {
                             "role": "user",
                             "content": (
-                                f"Provide a short example sentence using the word '{word['word']}'. "
-                                "The sentence should be concise and illustrative. Also, provide a Chinese translation of the example sentence. Separate the example sentence and translation with a newline."
+                                f"Provide a short example sentence using the word '{word['word']}' in the context of its meaning -'{word['definition']}'"
+                                "The sentence should be concise and illustrative. Also, provide a Chinese translation of the example sentence. You MUST separate the example sentence and translation with a newline."
                             ),
                         },
                     ],
@@ -296,6 +291,7 @@ def general_learning_mode(words_to_learn, section_name=None, starlist_manager=No
 
                     print(f"Example Sentence: {TextColors.LIGHT_MAGENTA}{example_sentence}{TextColors.ENDC}")
                     print(f"Translation     : {TextColors.LIGHT_YELLOW}{translation}{TextColors.ENDC}")
+                    print(f"For Debugging: {ai_reply}")
                 else:
                     print("Failed to generate an example sentence and translation.")
             elif command == 'q':
@@ -308,7 +304,7 @@ def general_learning_mode(words_to_learn, section_name=None, starlist_manager=No
             else:
                 print("Invalid command. Enter 'h' for help.")
 
-    print(f"\nCongratulations! You have completed learning all words. Progress: {learned_words}/{total_words}.")
+    print(f"\nCongratulations! You have completed learning all words. Progress: {total_words}/{total_words}.")
     
 
 ###################################SECTION LEARNING MODE IMPLEMENTATION###################################
@@ -340,7 +336,7 @@ def section_learning_mode(sections, current_section=None, starlist_manager=None)
         print("n: Go to the next section")
         print("q: Return to main menu")
 
-        navigation_input = input("Enter your choice (r/p/n/m): ").strip().lower()
+        navigation_input = input("Enter your choice (r/p/n/q): ").strip().lower()
 
         section_names = sorted(sections.keys(), key=lambda x: int(x.split(" ")[1]))
         current_index = section_names.index(current_section)
@@ -374,12 +370,18 @@ def starlist_manager_session(starlist_manager):
         print("3. Display star list")
         print("4. Test star list")
         print("5. Learn star list")
-        print("6. Exit star list management")
+        print("6. Add word pair manually to star list")
+        print("7. Exit star list management")
 
         command = input("Enter the number to select an option: ").strip()
         if command == '1':
-            starlist_manager.starred_words.clear()
-            print("Star list has been cleared.")
+            decision = input("Are you sure you want to clear the star list? (y/n): ").strip().lower()
+            if decision == 'y':
+                starlist_manager.starred_words.clear()
+                print("Star list has been cleared.")
+            else:
+                print("Clear operation cancelled.")
+            
         elif command == '2':
             # Display the current star list with indices
             print("\nStarred Words:")
@@ -404,8 +406,12 @@ def starlist_manager_session(starlist_manager):
             print("\nEntering Learning Mode for Starred Words... Shuffling...")
             shuffled_words = starlist_manager.starred_words[:]
             random.shuffle(shuffled_words)
-            learning_mode(shuffled_words)
+            learning_mode(shuffled_words, starlist_manager=starlist_manager)
         elif command == '6':
+            word = input("Enter the word: ").strip()
+            definition = input("Enter the definition: ").strip()
+            print(starlist_manager.add_to_star_list({'word': word, 'definition': definition}))
+        elif command == '7':
             print("Exiting star list management...")
             break
         else:
