@@ -1,9 +1,25 @@
 import csv
+import os
 
 class StarListManager:
     def __init__(self, file_path="star_words/stared.csv"):
         self.file_path = file_path
-        self.starred_words = self.load_starred_words()
+        directory = os.path.dirname(self.file_path)
+        if not os.path.exists(directory):
+            raise FileNotFoundError(f"The directory for the file path '{self.file_path}' does not exist.")
+        
+        if not os.path.exists(self.file_path):
+            user_input = input(f"The file '{self.file_path}' does not exist. Do you want to create a new star list? (y/n): ").strip().lower()
+            if user_input == 'y':
+                os.makedirs(directory, exist_ok=True)
+                with open(self.file_path, mode="w", newline="", encoding="utf-8") as file:
+                    writer = csv.writer(file)
+                    writer.writerow(["Word", "Definition"])
+                self.starred_words = []
+            else:
+                raise FileNotFoundError(f"The file '{self.file_path}' does not exist and no new file was created.")
+        else:
+            self.starred_words = self.load_starred_words()
 
     def add_to_star_list(self, word):
         if word not in self.starred_words:
