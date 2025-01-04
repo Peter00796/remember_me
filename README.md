@@ -9,7 +9,7 @@ This program allows you to learn, test, and manage vocabulary lists. It also pro
 1. **Install Python 3.**  
 2. **Install the package** (example command if you have built and published it):
    ```bash
-   pip install remember-me
+   pip install remember_me_gre
    ```
 3. Prepare a CSV file with vocabulary words (e.g., word_sheets/Word_Sheet1.csv).
 

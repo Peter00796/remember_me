@@ -9,7 +9,7 @@
 1. **安装 Python 3。**  
 2. **安装软件包**
     ```bash
-    pip install remember-me
+    pip install remember_me_gre
     ```
 3. 准备一个包含词汇的 CSV 文件（例如，word_sheets/Word_Sheet1.csv）。
 
